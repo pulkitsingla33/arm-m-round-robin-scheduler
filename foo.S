@@ -1,3 +1,10 @@
+//Systick Configuration Registers
+.equ SYST_CSR, 0xE000E010
+.equ SYST_RVR, 0xE000E014
+.equ SYST_CVR, 0xE000E018
+.equ SYST_CALIB, 0xE000E01C
+.equ TIMEOUT, 0x00FFFFFF
+
 .section .vectors
 vector_table:
     //Starting Address of SRAM in this CPU is 0x20000000
@@ -5,19 +12,38 @@ vector_table:
     //Stack Pointer grows downwards
     .word 0x20001000
     .word reset_handler
+
+.org 0x3C
+    .word systick_handler
     .zero 400
 
 .section .text
     .align 1 //Used to align instructions to (2^1) = 2 byte boundary since these are 16-bit instructions
     .type reset_handler %function
 reset_handler:
-    mov r1, #7
-    mov r2, #3
+    mov r5, #0
 
-    push {r1, r2}
+    ldr r0, =SYST_CSR
+    ldr r1, =SYST_RVR
+    ldr r2, =SYST_CVR
+    ldr r3, =TIMEOUT
 
-    mov r1, #5
-    mov r2, #6
+    str r3, [r1]
 
-    pop {r2, r1}
+    mov r3, #0x0
+    str r3, [r2]
+
+    mov r3, #0x7
+    str r3, [r0]
+
     bl .
+
+    .section .text
+    .align 1
+    .type systick_handler, %function
+systick_handler:
+
+    add r5, r5, #1
+breakpoint_pos:
+
+    bx lr
