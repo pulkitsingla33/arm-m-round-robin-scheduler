@@ -5,6 +5,8 @@
 .equ SYST_CALIB, 0xE000E01C
 .equ TIMEOUT, 0x00FFFFFF
 
+.equ FUNCTION_POS, 0x20002000
+
 .section .vectors
 vector_table:
     //Starting Address of SRAM in this CPU is 0x20000000
@@ -50,7 +52,44 @@ systick_handler:
     mov r2, r10
     mov r3, r11
     push {r0-r3}
+
 breakpoint_pos:
+
+    ldr r4, =first_run
+    ldr r5, [r4]
+    cmp r5, #1
+    beq skip_save
+
+    ldr r4, =current_task
+    ldr r5, [r4]
+    ldr r6, =sp_array
+    mov r7, r5
+    lsl r7, r7, #2
+    add r7, r7, r6
+    mov r0, sp
+    str r0, [r7]
+
+    add r5, r5, $1
+    cmp r5, #3
+    bne save_index
+    mov r5, #0
+save_index:
+    str r5, [r4]
+    b load_new_sp
+
+skip_save:
+    mov r5, #0
+    str r5, [r4]
+    ldr r4, =current_task
+    str r5, [r4]
+
+load_new_sp:
+    ldr r6, =sp_array
+    mov r7, r5
+    lsl r7, r7, #2
+    add r7, r7, r6
+    ldr r0, [r7]
+    mov sp, r0
 
     pop {r0-r3}
 
@@ -94,9 +133,16 @@ main3:
     .data
     .align 4
 
+current_task:   .word 0
+first_run:      .word 1
+
+sp_array:
+    .word stack1
+    .word stack2
+    .word stack3
 // These are the three stack regions defined for each task.
 // When we want to run the function, we pop these stacks, and at the end of the stack the PC changes to the actual function.
-stack_1:
+stack1:
     .word 0x18
     .word 0x19
     .word 0x1a
