@@ -69,7 +69,7 @@ breakpoint_pos:
     mov r0, sp
     str r0, [r7]
 
-    add r5, r5, $1
+    add r5, r5, #1
     cmp r5, #3
     bne save_index
     mov r5, #0
@@ -142,6 +142,8 @@ sp_array:
     .word stack3
 // These are the three stack regions defined for each task.
 // When we want to run the function, we pop these stacks, and at the end of the stack the PC changes to the actual function.
+
+.balign    8
 stack1:
     .word 0x18
     .word 0x19
@@ -160,8 +162,8 @@ stack1:
     .word main1
     .word 0x1000000
     .zero 64
-    .align 4
 
+    .balign 8
 stack2:
     .word 0x28
     .word 0x29
@@ -180,8 +182,8 @@ stack2:
     .word main2
     .word 0x1000000
     .zero 64
-    .align 4
 
+    .balign 8
 stack3:
     .word 0x38
     .word 0x39
