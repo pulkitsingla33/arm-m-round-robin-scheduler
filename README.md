@@ -20,5 +20,9 @@ Refer to the following resource when progressing through the course:
 ### Cortex-M3 Documentation
 1. [Cortex-M3 Devices Generic User Guide](https://developer.arm.com/documentation/dui0552/latest/)
 
+### Issues Faced
+1. `.balign 8` is needed before defining stack because before popping, stack pointer has to be at an 8-byte boundary, otherwise it will miss instructions.
+2. `.type` directive is necessary before writing any functions so that the processor knows that we are executing in thumb mode and not ARM mode. Cortex-M supports only thumb mode, and the address bit 0 is set to signify thumb mode of operation. The .type directive takes care of that.
+
 # Copyright
 Copyright © 2025 pyjamabrah.com. All Rights Reserved.

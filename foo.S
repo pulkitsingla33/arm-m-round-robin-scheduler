@@ -5,6 +5,7 @@
 .equ SYST_CALIB, 0xE000E01C
 
 .equ ICSR, 0xE000ED04
+.equ SHPR3, 0xE000ED20
 
 .equ TIMEOUT, 0x00FFFFFF
 
@@ -36,7 +37,9 @@ reset_handler:
     ldr r2, =SYST_CVR
     ldr r3, =TIMEOUT
 
-
+    ldr r4, =SHPR3
+    ldr r6, =0x00FF0000
+    str r6, [r4]
 
     str r3, [r1]
 
@@ -52,75 +55,18 @@ reset_handler:
     .align 1
     .type systick_handler, %function
 systick_handler:
-    // push {r4-r7}
-
-    // //The PUSH operation only supports registers upto R7
-    // mov r0, r8
-    // mov r1, r9
-    // mov r2, r10
-    // mov r3, r11
-    // push {r0-r3}
-
+    //Raise PendSV interrupt in ICSR register
     ldr r4, =ICSR
     ldr r5, =(1 << 28)
     str r5, [r4]
 
-// breakpoint_pos:
+    bx lr
 
-//     ldr r4, =first_run
-//     ldr r5, [r4]
-//     cmp r5, #1
-//     beq skip_save
-
-//     ldr r4, =current_task
-//     ldr r5, [r4]
-//     ldr r6, =sp_array
-//     mov r7, r5
-//     lsl r7, r7, #2
-//     add r7, r7, r6
-//     mov r0, sp
-//     str r0, [r7]
-
-//     add r5, r5, #1
-//     cmp r5, #3
-//     bne save_index
-//     mov r5, #0
-// save_index:
-//     str r5, [r4]
-//     b load_new_sp
-
-// skip_save:
-//     mov r5, #0
-//     str r5, [r4]
-//     ldr r4, =current_task
-//     str r5, [r4]
-
-// load_new_sp:
-//     ldr r6, =sp_array
-//     mov r7, r5
-//     lsl r7, r7, #2
-//     add r7, r7, r6
-//     ldr r0, [r7]
-//     mov sp, r0
-
-//     pop {r0-r3}
-
-//     mov r8, r0
-//     mov r9, r1
-//     mov r10, r2
-//     mov r11, r3
-
-//     pop {r4-r7}
-
-//     bx lr
-
-
-
+.section .text
+    .align 1
+    .type pendSV_handler, %function
+//PendSV interrupt handler
 pendSV_handler:
-    ldr r0, =ICSR
-    ldr r1, =(1 << 27)
-    str r1, [r0]
-
     push {r4-r7}
 
     //The PUSH operation only supports registers upto R7
