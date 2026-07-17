@@ -3,6 +3,9 @@
 .equ SYST_RVR, 0xE000E014
 .equ SYST_CVR, 0xE000E018
 .equ SYST_CALIB, 0xE000E01C
+
+.equ ICSR, 0xE000ED04
+
 .equ TIMEOUT, 0x00FFFFFF
 
 .equ FUNCTION_POS, 0x20002000
@@ -15,7 +18,10 @@ vector_table:
     .word 0x20001000
     .word reset_handler
 
-.org 0x3C
+//PendSV handler to be added at vector table address 0x38
+//Systick handler to be added at vector table address 0x3C, so it can be defined just after pendSV_handler
+.org 0x38
+    .word pendSV_handler
     .word systick_handler
     .zero 400
 
@@ -29,6 +35,8 @@ reset_handler:
     ldr r1, =SYST_RVR
     ldr r2, =SYST_CVR
     ldr r3, =TIMEOUT
+
+
 
     str r3, [r1]
 
@@ -44,6 +52,75 @@ reset_handler:
     .align 1
     .type systick_handler, %function
 systick_handler:
+    // push {r4-r7}
+
+    // //The PUSH operation only supports registers upto R7
+    // mov r0, r8
+    // mov r1, r9
+    // mov r2, r10
+    // mov r3, r11
+    // push {r0-r3}
+
+    ldr r4, =ICSR
+    ldr r5, =(1 << 28)
+    str r5, [r4]
+
+// breakpoint_pos:
+
+//     ldr r4, =first_run
+//     ldr r5, [r4]
+//     cmp r5, #1
+//     beq skip_save
+
+//     ldr r4, =current_task
+//     ldr r5, [r4]
+//     ldr r6, =sp_array
+//     mov r7, r5
+//     lsl r7, r7, #2
+//     add r7, r7, r6
+//     mov r0, sp
+//     str r0, [r7]
+
+//     add r5, r5, #1
+//     cmp r5, #3
+//     bne save_index
+//     mov r5, #0
+// save_index:
+//     str r5, [r4]
+//     b load_new_sp
+
+// skip_save:
+//     mov r5, #0
+//     str r5, [r4]
+//     ldr r4, =current_task
+//     str r5, [r4]
+
+// load_new_sp:
+//     ldr r6, =sp_array
+//     mov r7, r5
+//     lsl r7, r7, #2
+//     add r7, r7, r6
+//     ldr r0, [r7]
+//     mov sp, r0
+
+//     pop {r0-r3}
+
+//     mov r8, r0
+//     mov r9, r1
+//     mov r10, r2
+//     mov r11, r3
+
+//     pop {r4-r7}
+
+//     bx lr
+
+
+
+pendSV_handler:
+    ldr r0, =ICSR
+    ldr r1, =(1 << 27)
+    str r1, [r0]
+
     push {r4-r7}
 
     //The PUSH operation only supports registers upto R7
@@ -52,8 +129,6 @@ systick_handler:
     mov r2, r10
     mov r3, r11
     push {r0-r3}
-
-breakpoint_pos:
 
     ldr r4, =first_run
     ldr r5, [r4]
