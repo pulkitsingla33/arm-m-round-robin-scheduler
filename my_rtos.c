@@ -5,6 +5,7 @@
 TCB_t *current_tcb = 0;
 static TCB_t task_list[MAX_TASKS];
 static uint32_t task_count = 0;
+static uint32_t current_task_index = 0;
 
 static void task_exit(void)
 {
@@ -53,5 +54,13 @@ void xTaskCreate(void (*task_func)(void), uint32_t *stack_memory, uint32_t stack
     }
 
     task_count++;
+}
 
+void os_scheduler_yield(void)
+{
+    current_task_index++;
+    if(current_task_index >= task_count)
+        current_task_index = 0;
+
+    current_tcb = &task_list[current_task_index];
 }
