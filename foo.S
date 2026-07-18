@@ -126,34 +126,6 @@ load_new_sp:
 
     bx lr
 
-// //Tasks
-//     .section .text
-//     .p2align    4
-//     .global main1
-//     .type main1, %function
-// main1:
-//     NOP
-//     add r0, r0, #1
-//     b main1
-
-//     .section .text
-//     .p2align    4
-//     .global main2
-//     .type main2, %function
-// main2:
-//     NOP
-//     add r1, r1, #2
-//     b main2
-
-//     .section .text
-//     .p2align    4
-//     .global main3
-//     .type main3, %function
-// main3:
-//     NOP
-//     add r2, r2, #4
-//     b main3
-
     .data
     .align 4
     .type first_run, %object

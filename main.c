@@ -9,10 +9,8 @@ extern void os_start(void);
 
 void main1(void)
 {
-    static int a = 0;
-    static int b = 0;
-
-
+    int a = 0;
+    int b = 0;
     while(1)
     {
         a++;
@@ -22,9 +20,8 @@ void main1(void)
 
 void main2(void)
 {
-    static int a = 0;
-    static int b = 0;
-
+    int a = 0;
+    int b = 0;
     while(1)
     {
         a += 2;
@@ -32,11 +29,10 @@ void main2(void)
     }
 }
 
-
 void main()
 {
-    xTaskCreate(main1, stack1, STACK_SIZE_WORDS);
-    xTaskCreate(main2, stack2, STACK_SIZE_WORDS);
+    xTaskCreate(main1, stack1, STACK_SIZE_WORDS, 0);
+    xTaskCreate(main2, stack2, STACK_SIZE_WORDS, 0);
 
     os_start();
 

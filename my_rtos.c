@@ -15,7 +15,7 @@ static void task_exit(void)
     }
 }
 
-void xTaskCreate(void (*task_func)(void), uint32_t *stack_memory, uint32_t stack_size)
+void xTaskCreate(void (*task_func)(void), uint32_t *stack_memory, uint32_t stack_size, uint32_t priority)
 {
     if(task_count >= MAX_TASKS)
     {
@@ -48,6 +48,8 @@ void xTaskCreate(void (*task_func)(void), uint32_t *stack_memory, uint32_t stack
 
 
     task_list[task_count].stack_pointer = top_of_stack;
+    task_list[task_count].priority = priority;
+    task_list[task_count].state = READY;
 
     if(task_count == 0)
     {
@@ -59,9 +61,32 @@ void xTaskCreate(void (*task_func)(void), uint32_t *stack_memory, uint32_t stack
 
 void os_scheduler_yield(void)
 {
-    current_task_index++;
-    if(current_task_index >= task_count)
-        current_task_index = 0;
+    // current_task_index++;
+    // if(current_task_index >= task_count)
+    //     current_task_index = 0;
 
+    uint32_t task_iterator = current_task_index;
+    uint8_t round_robin_task = 0;
+
+    for(int i = 0; i < task_count; i++)
+    {
+        task_iterator = (task_iterator + 1) % task_count;
+
+        if(task_list[task_iterator].state != READY)
+        {
+            continue;
+        }
+
+        if(task_list[task_iterator].priority < task_list[current_task_index].priority)
+        {
+            current_task_index = task_iterator;
+            round_robin_task = 0;
+        }
+        else if((round_robin_task == 0) && (task_list[task_iterator].priority == task_list[current_task_index].priority))
+        {
+            round_robin_task = 1;
+            current_task_index = task_iterator;
+        }
+    }
     current_tcb = &task_list[current_task_index];
 }
