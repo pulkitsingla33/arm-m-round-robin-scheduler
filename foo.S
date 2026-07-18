@@ -16,7 +16,9 @@ vector_table:
     //Starting Address of SRAM in this CPU is 0x20000000
     //We are going 4KB above that starting address for the base of the stack pointer
     //Stack Pointer grows downwards
-    .word 0x20001000
+    // .word 0x20001000
+    //Earlier defined memory location was beyond stack memory defined in linker script
+    .word _estack
     .word reset_handler
 
 //PendSV handler to be added at vector table address 0x38
@@ -31,9 +33,6 @@ vector_table:
 .extern current_tcb
 .extern os_scheduler_yield
 .extern main
-
-current_task:   .word 0
-first_run:      .word 1
 
     .align 1 //Used to align instructions to (2^1) = 2 byte boundary since these are 16-bit instructions
     .type reset_handler %function
@@ -103,7 +102,8 @@ pendSV_handler:
 
     push {lr}
     bl os_scheduler_yield
-    pop {lr}
+    pop {r0}
+    mov lr, r0
 
 load_new_sp:
     //Clear the first_run flag
@@ -126,33 +126,35 @@ load_new_sp:
 
     bx lr
 
-//Tasks
-    .section .text
-    .p2align    4
-    .global main1
-    .type main1, %function
-main1:
-    NOP
-    add r0, r0, #1
-    b main1
+// //Tasks
+//     .section .text
+//     .p2align    4
+//     .global main1
+//     .type main1, %function
+// main1:
+//     NOP
+//     add r0, r0, #1
+//     b main1
 
-    .section .text
-    .p2align    4
-    .global main2
-    .type main2, %function
-main2:
-    NOP
-    add r1, r1, #2
-    b main2
+//     .section .text
+//     .p2align    4
+//     .global main2
+//     .type main2, %function
+// main2:
+//     NOP
+//     add r1, r1, #2
+//     b main2
 
-    .section .text
-    .p2align    4
-    .global main3
-    .type main3, %function
-main3:
-    NOP
-    add r2, r2, #4
-    b main3
+//     .section .text
+//     .p2align    4
+//     .global main3
+//     .type main3, %function
+// main3:
+//     NOP
+//     add r2, r2, #4
+//     b main3
 
     .data
     .align 4
+    .type first_run, %object
+first_run: .word 1

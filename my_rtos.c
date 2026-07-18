@@ -37,14 +37,15 @@ void xTaskCreate(void (*task_func)(void), uint32_t *stack_memory, uint32_t stack
     top_of_stack[8] = 0x00000000;           // R0
 
     // Populate Manually-Popped Registers (by software)
-    top_of_stack[7] = 0x11111111;           // R11
-    top_of_stack[6] = 0x10101010;           // R10
-    top_of_stack[5] = 0x09090909;           // R9
-    top_of_stack[4] = 0x08080808;           // R8
-    top_of_stack[3] = 0x07070707;           // R7
-    top_of_stack[2] = 0x06060606;           // R6
-    top_of_stack[1] = 0x05050505;           // R5
-    top_of_stack[0] = 0x04040404;           // R4
+    top_of_stack[7] = 0x07070707;           // R7
+    top_of_stack[6] = 0x06060606;           // R6
+    top_of_stack[5] = 0x05050505;           // R5
+    top_of_stack[4] = 0x04040404;           // R4
+    top_of_stack[3] = 0x11111111;           // R11
+    top_of_stack[2] = 0x10101010;           // R10
+    top_of_stack[1] = 0x09090909;           // R9
+    top_of_stack[0] = 0x08080808;           // R8
+
 
     task_list[task_count].stack_pointer = top_of_stack;
 

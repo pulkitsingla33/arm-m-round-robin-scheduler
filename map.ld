@@ -13,5 +13,9 @@ SECTIONS
 
     .data : {
         *(.data*)
-    } > RAM AT > RAM
+        *(.bss*)
+        *(COMMON)
+    } > RAM
+
+    _estack = ORIGIN(RAM) + LENGTH(RAM);
 }
