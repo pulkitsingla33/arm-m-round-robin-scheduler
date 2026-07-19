@@ -4,10 +4,11 @@
 .equ SYST_CVR, 0xE000E018
 .equ SYST_CALIB, 0xE000E01C
 
+.global ICSR
 .equ ICSR, 0xE000ED04
 .equ SHPR3, 0xE000ED20
 
-.equ TIMEOUT, 0x00FFFFFF
+.equ TIMEOUT, 0x00005DBF
 
 .equ FUNCTION_POS, 0x20002000
 
@@ -33,6 +34,9 @@ vector_table:
 .extern current_tcb
 .extern os_scheduler_yield
 .extern main
+.extern system_ticks
+.extern decrement_task_ticks
+.extern create_idle_task
 
     .align 1 //Used to align instructions to (2^1) = 2 byte boundary since these are 16-bit instructions
     .type reset_handler %function
@@ -45,6 +49,11 @@ reset_handler:
     .global os_start
     .type os_start, %function
 os_start:
+    push {r4, lr}
+    bl create_idle_task
+    pop {r4, r5}
+    mov lr, r5
+
     ldr r0, =SYST_CSR
     ldr r1, =SYST_RVR
     ldr r2, =SYST_CVR
@@ -68,6 +77,16 @@ os_start:
     .align 1
     .type systick_handler, %function
 systick_handler:
+    ldr r0, =system_ticks
+    ldr r1, [r0]
+    add r1, r1, #1
+    str r1, [r0]
+
+    push {r4, lr}
+    bl decrement_task_ticks
+    pop {r4, r5}
+    mov lr, r5
+
     //Raise PendSV interrupt in ICSR register
     ldr r4, =ICSR
     ldr r5, =(1 << 28)
@@ -100,10 +119,10 @@ pendSV_handler:
     mov r0, sp
     str r0, [r5]
 
-    push {lr}
+    push {r4, lr}
     bl os_scheduler_yield
-    pop {r0}
-    mov lr, r0
+    pop {r4, r5}
+    mov lr, r5
 
 load_new_sp:
     //Clear the first_run flag

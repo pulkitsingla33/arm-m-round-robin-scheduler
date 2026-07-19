@@ -15,6 +15,7 @@ void main1(void)
     {
         a++;
         b += 2;
+        vTaskDelay(5000);
     }
 }
 
@@ -26,6 +27,7 @@ void main2(void)
     {
         a += 2;
         b += 4;
+        vTaskDelay(4000);
     }
 }
 

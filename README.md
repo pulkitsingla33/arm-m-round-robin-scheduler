@@ -24,5 +24,10 @@ Refer to the following resource when progressing through the course:
 1. `.balign 8` is needed before defining stack because before popping, stack pointer has to be at an 8-byte boundary, otherwise it will miss instructions.
 2. `.type` directive is necessary before writing any functions so that the processor knows that we are executing in thumb mode and not ARM mode. Cortex-M supports only thumb mode, and the address bit 0 is set to signify thumb mode of operation. The .type directive takes care of that.
 
+### Future Upgrades
+1. Use a linked list to insert new tasks, and keep IDLE task by default at the end of the list.
+2. Maintain two lists, one READY list and one DELAYED list for faster traversal through the lists.
+3. Keep the task with shortest wait time at the top of the list, and then compare with just that to minimize list traversal.
+
 # Copyright
 Copyright © 2025 pyjamabrah.com. All Rights Reserved.
