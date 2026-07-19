@@ -19,7 +19,7 @@ static void task_exit(void)
 {
     while(1)
     {
-
+        __asm volatile ("wfi");
     }
 }
 
@@ -127,7 +127,10 @@ void decrement_task_ticks()
 
 void idle_task(void)
 {
-    while(1);
+    while(1)
+    {
+        __asm volatile ("wfi");
+    }
 }
 
 void create_idle_task(void)
